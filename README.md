@@ -83,6 +83,7 @@ Botões para exportar em .json e .csv
 
 ![{91C82B29-CB60-4670-B481-088E1C1FEC20}](https://github.com/user-attachments/assets/5b48b48b-9059-4b9a-9c16-dd5552398489)
 
+![{15B76A50-5E64-484D-8BDD-10F5194A378C}](https://github.com/user-attachments/assets/9bad3020-6d3a-4a92-a2a2-04a3bfe66ff2)
 
 
 
