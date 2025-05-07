@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarefas em tempo real</title>
+</head>
+<body>
+  <h1>Nova tarefa</h1>
+  <form id="form-tarefa">
+    <input type="text" id="titulo" placeholder="Digite a tarefa" required />
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <h2>Lista de tarefas:</h2>
+  <ul id="lista-tarefas"></ul>
+
+  <hr>
+
+  <h3>Exportar tarefas:</h3>
+  <button onclick="exportar('json')">📄 Baixar JSON</button>
+  <button onclick="exportar('csv')">📊 Baixar CSV</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const lista = document.getElementById('lista-tarefas');
+
+    function adicionarNaLista(tarefa) {
+      const li = document.createElement('li');
+      li.textContent = `(${tarefa.id}) ${tarefa.titulo} - ${tarefa.concluido ? '✅' : '❌'}`;
+      if (!tarefa.concluido) {
+        const btn = document.createElement('button');
+        btn.textContent = 'Concluir';
+        btn.onclick = () => concluirTarefa(tarefa.id, li);
+        li.appendChild(btn);
+      }
+      lista.appendChild(li);
+    }
+
+    function concluirTarefa(id, li) {
+      fetch(`/tarefas/${id}/concluir`, { method: 'PUT' })
+        .then(() => {
+          li.innerHTML = li.textContent.replace('❌', '✅');
+        });
+    }
+
+    document.getElementById('form-tarefa').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const titulo = document.getElementById('titulo').value;
+      fetch('/tarefas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titulo })
+      });
+      document.getElementById('titulo').value = '';
+    });
+
+    fetch('/tarefas')
+      .then(res => res.json())
+      .then(tarefas => tarefas.forEach(adicionarNaLista));
+
+    socket.on('novaTarefa', adicionarNaLista);
+
+    function exportar(tipo) {
+      const url = tipo === 'csv' ? '/export/csv' : '/export/json';
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tarefas.${tipo}`;
+      link.click();
+    }
+  </script>
+</body>
+</html>
